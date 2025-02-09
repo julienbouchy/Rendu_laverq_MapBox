@@ -1,0 +1,3 @@
+Lors de l'affichage de l'HTML, un problème a été rencontré car de mon coté j'ai l'aperçu en plein écran et pas l'affichage des filtres et des logos et du coté de Guillaume tout fonctionne, je vous écrit donc ce message dans le cas ou de votre coté cela ne marcherais pas et je vous joint une capture d'écran des deux visions, peut-être que cela doit provenir de l'utilisation de certains navigateurs.
+
+
