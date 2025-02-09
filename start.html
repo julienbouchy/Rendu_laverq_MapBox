@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<link rel="stylesheet" href="reseaucss.css">
+
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.3/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.3/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+</style>
+
+</head>
+
+
+
+<body>
+<header>
+		<a href='https://www.laverq.net/'><img src='logo-ubaye.png' alt= 'logo ubaye'></a>
+		<img id="second-logo" src='logo_hill.png' alt= 'logo hill'>
+</header>
+
+
+<div class="header-container">
+    <h1>itinéraire de randonnée au Laverq</h1>
+</div>
+
+
+<main>
+<section>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+
+<div id='map' class='map'></div>
+
+<div class='map-overlay-2 top'>
+    <div class='map-overlay-inner'>
+        <fieldset>
+		
+            <label class="categoryLabel">Par G.DIDERON et J.BOUCHY</label>
+
+				<div>
+                <input type="checkbox" id="favorableCB" value="favorable" onchange="switchlayer('favorable')"/>
+                <label for="favorableCB">Favorable</label>
+				</div>
+		
+				<div>
+                <input type="checkbox" id="intermediaireCB" value="intermediaire" onchange="switchlayer('intermediaire')"/>
+                <label for="intermediaireCB">Intermediaire</label>
+				</div>
+		
+				<div>
+                <input type="checkbox" id="defavorableCB" value="defavorable" onchange="switchlayer('defavorable')"/>
+                <label for="defavorableCB">Defavorable</label>
+				</div>
+				
+				<div>
+                <input type="checkbox" id="finalCB" value="final" onchange="switchlayer('final')"/>
+                <label for="finalCB">Final</label>
+				</div>
+				
+				<div>
+                <input type="checkbox" id="arretfavCB" value="arretfav" onchange="switchlayer('arretfav')"/>
+                <label for="arretfavCB">Arrêt favorable</label>
+				</div>
+				
+				<div>
+                <input type="checkbox" id="arretinterCB" value="arretinter" onchange="switchlayer('arretinter')"/>
+                <label for="arretinterCB">Arrêt intermédiaire</label>
+				</div>
+				
+				<div>
+                <input type="checkbox" id="arretdefCB" value="arretdef" onchange="switchlayer('arretdef')"/>
+                <label for="arretdefCB">Arrêt défavorable</label>
+				</div>
+				
+				<div>
+                <input type="checkbox" id="arretfinCB" value="arretfin" onchange="switchlayer('arretfin')"/>
+                <label for="arretfinCB">Arrêt final</label>
+				</div>
+				
+		</fieldset>
+		
+    </div>
+</div>
+
+<script>
+mapboxgl.accessToken = 
+'pk.eyJ1IjoiZGFibzIyIiwiYSI6ImNremltNXR2aTMxaG0ydW8xYmcwOGU3YjUifQ.33TjJKovMQpZ1dkC0S9K3Q';
+
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/dabo22/cm64rigoq004q01sia8vw9em8', <!-- Le modèle DEM fonctionne uniquement avec le style satellite streets-v12 -->
+center: [6.501669 , 44.399495 ],// En degré décimal depuis Géoportail
+zoom: 12, // zoom
+pitch: 80, // Inclinaison
+bearing:41 // Rotation
+
+ });
+ 
+ 
+ 
+      // Configuration de la source Topographie
+	map.on('style.load', () => {
+			map.addSource('mapbox-dem', { // Définition de la source de donnée
+				'type': 'raster-dem',
+				'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',  // On ajoute le MNT à notre carte
+				'tileSize': 512,
+				'maxzoom': 14
+			});
+        // add the DEM source as a terrain layer with exaggerated height
+    map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1 }); // On ajoute une exagération de 1.5 pour la rendre réaliste	
+
+
+	map.addSource('favorable', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.4ysq4zo6'}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.addLayer({
+			'id': 'favorable', <!-- Donner le nom que l'on souhaite -->
+			'type': 'line',
+			'source': 'favorable', <!-- Donner le nom que l'on souhaite -->
+			'source-layer':'Favorable-cv3ubj',
+			"filter": ["all",["==", "fav", "favorable"]],
+			'layout': {'visibility': 'none', 'line-join': 'round','line-cap': 'round'},
+			'paint': {'line-width': 2, 'line-color': 'green',} <!--bien mettre line-width et line-color quand le type est line, la couleur est à bleue  -->
+			});
+			
+				map.addSource('intermediaire', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.4ysq4zo6'}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.addLayer({
+			'id': 'intermediaire', <!-- Donner le nom que l'on souhaite -->
+			'type': 'line',
+			'source': 'intermediaire', <!-- Donner le nom que l'on souhaite -->
+			'source-layer':'Favorable-cv3ubj',
+			"filter": ["all",["==", "fav", "intermediaire"]],
+			'layout': {'visibility': 'none', 'line-join': 'round','line-cap': 'round'},
+			'paint': {'line-width': 2, 'line-color': 'orange',} <!--bien mettre line-width et line-color quand le type est line, la couleur est à bleue  -->
+			});
+			
+				map.addSource('defavorable', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.4ysq4zo6'}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.addLayer({
+			'id': 'defavorable', <!-- Donner le nom que l'on souhaite -->
+			'type': 'line',
+			'source': 'defavorable', <!-- Donner le nom que l'on souhaite -->
+			'source-layer':'Favorable-cv3ubj',
+			"filter": ["all",["==", "fav", "defavorable"]],
+			'layout': {'visibility': 'none', 'line-join': 'round','line-cap': 'round'},
+			'paint': {'line-width': 2, 'line-color': 'red',} <!--bien mettre line-width et line-color quand le type est line, la couleur est à bleue  -->
+			});
+			
+			map.addSource('final', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.4mzyiuf2'}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.addLayer({
+			'id': 'final', <!-- Donner le nom que l'on souhaite -->
+			'type': 'line',
+			'source': 'final', <!-- Donner le nom que l'on souhaite -->
+			'source-layer':'iti-clso9i',
+			//"filter": ["all",["==", "fav", "final"]],
+			'layout': {'visibility': 'visible', 'line-join': 'round','line-cap': 'round'},
+			'paint': {'line-width': 2, 'line-color': 'cyan',} <!--bien mettre line-width et line-color quand le type est line, la couleur est à bleue  -->
+			});
+			
+			
+
+			
+			
+			map.addSource('arretfav', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.7obl02z1',
+			minzoom: 0,
+			maxzoom: 22}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.loadImage('https://i.imgur.com/UBu5CSE.png', function (error, green) { <!-- Je charge depuis mes images téléversées sur Imgur l'image normalisée de la prise d'eau -->
+			//this is where we load the image file
+            if (error) throw error;
+            map.addImage("arretfav", green); //this is where we name the image file we are loading
+            map.addLayer({
+                'id': 'arretfav',
+                'type': 'symbol',
+                'source': 'arretfav',
+				"filter": ["any",["==", "Points", "favorable"], ["==", "Points", "fav_inter"], ["==", "Points", "commun"]] , <!-- C'est génial, je peux filtrer selon le champ type_ouv: Ventouse, Prise d'eau, Borne d'irrigation, Autre: Anti-coup de Bélier -->
+                'source-layer': 'point_arrets-a7alb2',  <!-- ATTENTION de bien ajouter la source layer provenant de Mapbox -->
+                'layout': {
+                    'icon-image': "arretfav",
+                    'icon-size': 0.03,
+                    'icon-allow-overlap': true,
+					'visibility': 'none' <!-- Je n'affiche pas d'emblée la visibilité de la couche -->
+                }
+				});
+			});
+			
+			map.addSource('arretinter', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.7obl02z1',
+			minzoom: 0,
+			maxzoom: 22}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.loadImage('https://i.imgur.com/UBu5CSE.png', function (error, green) { <!-- Je charge depuis mes images téléversées sur Imgur l'image normalisée de la prise d'eau -->
+			//this is where we load the image file
+            if (error) throw error;
+            map.addImage("arretinter", green); //this is where we name the image file we are loading
+            map.addLayer({
+                'id': 'arretinter',
+                'type': 'symbol',
+                'source': 'arretinter',
+				"filter": ["any",["==", "Points", "intermediaire"], ["==", "Points", "fav_inter"], ["==", "Points", "commun"]] , <!-- C'est génial, je peux filtrer selon le champ type_ouv: Ventouse, Prise d'eau, Borne d'irrigation, Autre: Anti-coup de Bélier -->
+                'source-layer': 'point_arrets-a7alb2',  <!-- ATTENTION de bien ajouter la source layer provenant de Mapbox -->
+                'layout': {
+                    'icon-image': "arretinter",
+                    'icon-size': 0.03,
+                    'icon-allow-overlap': true,
+					'visibility': 'none' <!-- Je n'affiche pas d'emblée la visibilité de la couche -->
+                }
+				});
+			});
+			
+			map.addSource('arretdef', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.7obl02z1',
+			minzoom: 0,
+			maxzoom: 22}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.loadImage('https://i.imgur.com/UBu5CSE.png', function (error, green) { <!-- Je charge depuis mes images téléversées sur Imgur l'image normalisée de la prise d'eau -->
+			//this is where we load the image file
+            if (error) throw error;
+            map.addImage("arretdef", green); //this is where we name the image file we are loading
+            map.addLayer({
+                'id': 'arretdef',
+                'type': 'symbol',
+                'source': 'arretdef',
+				"filter": ["any",["==", "Points", "defavorable"],["==", "Points", "commun"]] , <!-- C'est génial, je peux filtrer selon le champ type_ouv: Ventouse, Prise d'eau, Borne d'irrigation, Autre: Anti-coup de Bélier -->
+                'source-layer': 'point_arrets-a7alb2',  <!-- ATTENTION de bien ajouter la source layer provenant de Mapbox -->
+                'layout': {
+                    'icon-image': "arretdef",
+                    'icon-size': 0.03,
+                    'icon-allow-overlap': true,
+					'visibility': 'none' <!-- Je n'affiche pas d'emblée la visibilité de la couche -->
+                }
+				});
+			});
+			
+				map.addSource('arretfin', { <!-- Ne pas mettre d'underscore dans l'appelation du nom de la source, ça ne marchait pas avec waypoints_co_brusquet j'ai alors supprimé les underscores pour garder uniquement waypoints-->
+			type: 'vector',
+			url: 'mapbox://dabo22.3tegahat',
+			minzoom: 0,
+			maxzoom: 22}); <!-- Bien ajouter l'id du tileset de Mapbox -->
+			
+			map.loadImage('https://i.imgur.com/UBu5CSE.png', function (error, green) { <!-- Je charge depuis mes images téléversées sur Imgur l'image normalisée de la prise d'eau -->
+			//this is where we load the image file
+            if (error) throw error;
+            map.addImage("arretfin", green); //this is where we name the image file we are loading
+            map.addLayer({
+                'id': 'arretfin',
+                'type': 'symbol',
+                'source': 'arretfin',
+                'source-layer': 'point-dd5kiq',  <!-- ATTENTION de bien ajouter la source layer provenant de Mapbox -->
+                'layout': {
+                    'icon-image': "arretfin",
+                    'icon-size': 0.03,
+                    'icon-allow-overlap': true,
+					'visibility': 'visible' <!-- Je n'affiche pas d'emblée la visibilité de la couche -->
+                }
+				});
+			});
+			
+var imagesLocales = {
+    "1": "img/gite.jpg",
+    "2": "img/abbaye.jpg",
+    "3": "img/pied_prats.jpg",
+	"4": "img/monter.jpg",
+    "5": "img/prem_mont.jpg",
+    "6": "img/deux_mon.jpg",
+	"7": "img/mis_iti.jpg",
+    "8": "img/talweg.jpg",
+    "9": "img/gautier.jpg",
+	"10": "img/sortie_dir_col.jpg",
+    "11": "img/falaise_glacier.jpg",
+    "12": "img/avalanche.jpg"
+
+};
+		map.on('click', 'arretfin', function (e) {
+    var coordinates = e.features[0].geometry.coordinates.slice();
+    var properties = e.features[0].properties;
+
+    console.log("Propriétés du point :", properties); // Debugging
+
+    var description = properties.description || "Pas de description disponible.";
+
+    // Assurer que l'ID est bien une chaîne pour correspondre à imagesLocales
+    var pointId = String(properties.id); 
+    var imageUrl = imagesLocales[pointId] || "https://via.placeholder.com/150";
+
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    }
+	
+	var description = properties.desc || "Pas de description disponible.";
+
+   new mapboxgl.Popup()
+    .setLngLat(coordinates)
+    .setHTML(`
+        <div class="popup-container">
+            <img src="${imageUrl}" class="popup-image" alt="Image du point">
+            <p class="popup-description">${description}</p>
+        <p><strong>Coordonnées :</strong> ${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}</p>
+            </div>
+    `)
+    .addTo(map);
+});
+
+			switchlayer = function (lname) {
+            if (document.getElementById(lname + "CB").checked) {
+                map.setLayoutProperty(lname, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(lname, 'visibility', 'none');
+           }
+        }
+		
+   
+	    });
+		
+		// Ajout Echelle cartographique a la fin du script
+			map.addControl(new mapboxgl.ScaleControl({
+			maxWidth: 120,
+			unit: 'metric'}));
+		
+</script>
+</section>
+</main>
+
+
+</body>
+</html>
+
+<!-- j'ai essayé de faire en sorte que l'image ne cache pas le pop-up mais rien à fonctionner  -->
